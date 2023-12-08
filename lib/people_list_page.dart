@@ -1,5 +1,7 @@
 import 'package:employees_catalogue/data/component.dart';
 import 'package:employees_catalogue/data/person.dart';
+import 'package:employees_catalogue/data/extensions.dart';
+import 'package:employees_catalogue/person_details_page.dart';
 import 'package:employees_catalogue/widget_keys.dart';
 import 'package:flutter/material.dart';
 
@@ -39,7 +41,9 @@ class _PeopleListPageState extends State<PeopleListPage> {
         leading: LeadingWidget(
           isSearching: _isSearching,
           onClick: () {
-            // TODO
+            setState(() {
+              _isSearching = !_isSearching;
+            });
           },
         ),
         title: _isSearching
@@ -47,6 +51,12 @@ class _PeopleListPageState extends State<PeopleListPage> {
                 key: WidgetKey.search,
                 controller: _searchController,
                 autofocus: true,
+                onChanged: (value) {
+                  setState(() {
+                    people = Component.instance.api.searchPeople(
+                        query: value, responsibility: responsibilityFilter);
+                  });
+                },
                 decoration: InputDecoration(
                   hintText: "Search employee...",
                   border: InputBorder.none,
@@ -66,17 +76,29 @@ class _PeopleListPageState extends State<PeopleListPage> {
                     ),
                   ),
                   onTap: () {
-                    // TODO
+                    setState(() {
+                      responsibilityFilter = null;
+                      people = Component.instance.api.searchPeople();
+                    });
                   },
                 )
               : PopupMenuButton<Responsibility>(
                   key: WidgetKey.filter,
                   icon: Icon(Icons.filter_list),
                   onSelected: (responsibility) {
-                    // TODO
+                    setState(() {
+                      responsibilityFilter = responsibility;
+                      people = Component.instance.api.searchPeople(
+                          query: previousQuery, responsibility: responsibility);
+                    });
                   },
                   itemBuilder: (BuildContext context) {
-                    throw UnimplementedError(); // TODO
+                    return Responsibility.values.map((responsibility) {
+                      return PopupMenuItem<Responsibility>(
+                        value: responsibility,
+                        child: Text(responsibility.toNameString()),
+                      );
+                    }).toList();
                   },
                 )
         ],
@@ -84,7 +106,11 @@ class _PeopleListPageState extends State<PeopleListPage> {
       body: ListView.builder(
         key: WidgetKey.listOfPeople,
         itemBuilder: (context, index) {
-          throw UnimplementedError(); // TODO
+          var responsibility = people[index].responsibility.toNameString();
+          return PersonItemWidget(
+              id: people[index].id,
+              fullName: people[index].fullName,
+              responsibility: responsibility);
         },
         itemCount: people.length,
       ),
@@ -96,7 +122,9 @@ class LeadingWidget extends StatelessWidget {
   final bool isSearching;
   final Function() onClick;
 
-  const LeadingWidget({Key? key, this.isSearching = false, required this.onClick}) : super(key: key);
+  const LeadingWidget(
+      {Key? key, this.isSearching = false, required this.onClick})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -114,10 +142,27 @@ class PersonItemWidget extends StatelessWidget {
   final String fullName;
   final String responsibility;
 
-  const PersonItemWidget({Key? key, required this.id, required this.fullName, this.responsibility = ''}) : super(key: key);
+  const PersonItemWidget({
+    Key? key,
+    required this.id,
+    required this.fullName,
+    this.responsibility = '',
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    throw UnimplementedError(); // TODO
+    return Card(
+      child: ListTile(
+        onTap: () {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => PersonDetailsPage(personId: id)));
+        },
+        title: Text(fullName,
+            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+        subtitle: Text(responsibility, style: TextStyle(color: Colors.black)),
+      ),
+    );
   }
 }

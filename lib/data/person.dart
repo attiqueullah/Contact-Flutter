@@ -6,7 +6,15 @@ class Person {
   final String phone;
   final String email;
 
-  Person(this.id, this.fullName, this.responsibility, this.room, this.phone, this.email);
+  Person(this.id, this.fullName, this.responsibility, this.room, this.phone,
+      this.email);
 }
 
-enum Responsibility { DevOps, Accounting, IT_Support, Marketing, Infrastructure, Sales }
+enum Responsibility {
+  DevOps,
+  Accounting,
+  IT_Support,
+  Marketing,
+  Infrastructure,
+  Sales
+}
