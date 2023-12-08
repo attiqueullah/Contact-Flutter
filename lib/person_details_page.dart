@@ -21,8 +21,15 @@ class _PersonDetailsPageState extends State<PersonDetailsPage> {
     super.initState();
     if (widget.personId != null) {
       person = Component.instance.api.getPerson(widget.personId);
+      if (person == null) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          Navigator.of(context).pop();
+        });
+      }
     } else {
-      Navigator.pop(context);
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Navigator.of(context).pop();
+      });
     }
   }
 

@@ -106,11 +106,10 @@ class _PeopleListPageState extends State<PeopleListPage> {
       body: ListView.builder(
         key: WidgetKey.listOfPeople,
         itemBuilder: (context, index) {
-          var responsibility = people[index].responsibility.toNameString();
           return PersonItemWidget(
               id: people[index].id,
               fullName: people[index].fullName,
-              responsibility: responsibility);
+              responsibility: people[index].responsibility.toNameString());
         },
         itemCount: people.length,
       ),
@@ -151,17 +150,20 @@ class PersonItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: ListTile(
-        onTap: () {
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => PersonDetailsPage(personId: id)));
-        },
-        title: Text(fullName,
-            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
-        subtitle: Text(responsibility, style: TextStyle(color: Colors.black)),
+    return InkWell(
+      onTap: () {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => PersonDetailsPage(personId: id)));
+      },
+      child: Column(
+        children: [
+          Text('$fullName',
+              style:
+                  TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+          Text('$responsibility', style: TextStyle(color: Colors.black))
+        ],
       ),
     );
   }
